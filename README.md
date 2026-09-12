@@ -67,7 +67,9 @@ Post
 
 #### Трафик
 
-    traffic в сезон = 20 * 5mb = 100 mb/s
+    traffic в сезон (meta+text) = 20 * 4kb = 80 kb/s
+    traffic в сезон (static) = 20 * 5mb = 100 mb/s
+
 
 ### Получение ленты (read)
 
@@ -80,11 +82,13 @@ Post
 #### Transaction
 
     post = post при создании + reactions_count (8 bytes)
-    Лента = 5 * post ~= 5 * 5mb ~= 25mb
+    Лента (meta+text) = 5 * post(meta+text) ~= 5 * 4kb ~= 20kb
+    Лента (static) = 5 * post(static) ~= 5 * 5mb ~= 25mb
 
 #### Трафик
 
-    traffic в сезон = 900 * 25mb = 22 gb/s
+    traffic в сезон (meta+text) = 900 * 20kb = 18 mb/s
+    traffic в сезон (static) = 900 * 25mb = 22 gb/s
 
 ### Получение ленты популярных мест (read)
 
@@ -96,7 +100,8 @@ Post
 
 #### Трафик
 
-    traffic в сезон = 300 * 25mb = 7 gb/s
+    traffic в сезон (meta+text) = 300 * 20kb = 6 mb/s
+    traffic в сезон (static) = 300 * 25mb = 7 gb/s
 
 ### Написание комментариев (write)
 
@@ -108,7 +113,7 @@ Post
 
 #### Трафик
 
-    traffic в сезон = 100 * 500 = 50 kb/s
+    traffic в сезон = 100 * 500 * 2 = 100 kb/s
 
 ### Просмотр комментариев (read)
 
@@ -120,7 +125,7 @@ Post
 
 #### Трафик
 
-    traffic в сезон = 9000 * 500 = 5 mb/s
+    traffic в сезон = 9000 * 500 * 2 = 10 mb/s
 
 ### оценивание/реакции (write)
 
