@@ -36,7 +36,7 @@ paths:
                   type: string
               required:
                 - text
-                - img_urls
+                - img_names
                 - place_id
             examples:
               request:
@@ -113,11 +113,15 @@ paths:
               request:
                 value:
                   post_id: "fdslkfmsdl"
-                  imgs: [
-                    {"name": "img3", "action": "INSERT", "position": 2},
-                    {"name": "img2", "action": "DELETE"},
-                    {"name": "img1", "action": "MOVE", "position": 1},
-                  ]
+                  imgs:
+                    - name: "img3"
+                      action: "INSERT"
+                      position: 2
+                    - name: "img2"
+                      action: "DELETE"
+                    - name: "img1"
+                      action: "MOVE"
+                      position: 1
       responses:
         "200":
           description: Ok
@@ -145,29 +149,6 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-    delete:
-      summary: Deletes post
-      description: Method deletes post
-      tags:
-        - Post
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                post_id:
-                  type: string
-              required:
-                - post_id
-      responses:
-        "200":
-          description: Ok
-        "400":
-          description: Bad Request
-        "500":
-          description: Server error
   /post/{id}:
     get:
       summary: Receive post
@@ -179,6 +160,8 @@ paths:
           in: path
           required: true
           description: Post id
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
@@ -222,11 +205,32 @@ paths:
                 response:
                   value:
                     id: "12ae3c"
+                    text: "some information"
                     img_urls: ["https://some_domain.some_storage/msdlfkmsd"]
                     place_id: "dsfdsf"
                     rating: 13
                     comments_count: 0
                     is_rated: false
+                    author_id: "9fb21c"
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+    delete:
+      summary: Deletes post
+      description: Method deletes post
+      tags:
+        - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Post id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
         "400":
           description: Bad Request
         "500":
@@ -241,15 +245,29 @@ paths:
         - name: place_id
           in: query
           required: false
+          description: Filter posts by place
+          schema:
+            type: string
         - name: user_id
           in: query
           required: false
+          description: Filter posts by author
+          schema:
+            type: string
         - name: limit
           in: query
           required: false
+          description: Max number of posts to return
+          schema:
+            type: integer
+            default: 20
         - name: offset
           in: query
           required: false
+          description: Number of posts to skip
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Ok
@@ -397,22 +415,19 @@ paths:
           description: Bad Request
         "500":
           description: Server error
+  /comment/{id}:
     delete:
       summary: Deletes comment
       description: Method deletes comment
       tags:
         - Comment
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                comment_id:
-                  type: string
-              required:
-                - comment_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Comment id
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
@@ -427,19 +442,34 @@ paths:
       tags:
         - Comment
       parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: Post id
+          schema:
+            type: string
         - name: position
           in: query
           required: true
           description: pointer from which should read comments
+          schema:
+            type: integer
         - name: limit
           in: query
           required: true
-        - name: post_id
-          in: path
-          required: true
+          description: Max number of comments to return
+          schema:
+            type: integer
         - name: direction
-          in: path
+          in: query
           required: false
+          description: direction to read comments from the position
+          schema:
+            type: string
+            enum:
+              - PREV
+              - NEXT
+            default: NEXT
       responses:
         "200":
           description: Ok
@@ -490,6 +520,8 @@ paths:
           in: path
           required: true
           description: User id
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
@@ -563,12 +595,23 @@ paths:
         - name: id
           in: path
           required: true
+          description: Place id
+          schema:
+            type: string
         - name: limit
           in: query
           required: false
+          description: Max number of places to return
+          schema:
+            type: integer
+            default: 20
         - name: offset
           in: query
           required: false
+          description: Number of places to skip
+          schema:
+            type: integer
+            default: 0
       responses:
         "200":
           description: Ok
@@ -591,8 +634,8 @@ paths:
               examples:
                 response:
                   value:
-                    id: "12ae3c"
-                    rating: 123
+                    - id: "12ae3c"
+                      rating: 123
         "400":
           description: Bad Request
         "500":
