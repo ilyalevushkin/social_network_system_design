@@ -1,0 +1,757 @@
+openapi: 3.0.0
+
+tags:
+  - name: Post
+  - name: Comment
+  - name: User
+  - name: Place
+  - name: Auth
+
+info:
+  title: TripSocialNetwork API
+  description: Current API describes interaction with TripSocialNetwork
+  version: 1.0.0
+
+paths:
+  /post:
+    post:
+      summary: Create post
+      description: Method creates post
+      tags:
+        - Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                img_names:
+                  type: array
+                  items:
+                    type: string
+                    description: unique image names to upload
+                place_id:
+                  type: string
+              required:
+                - text
+                - img_names
+                - place_id
+            examples:
+              request:
+                value:
+                  text: "some information"
+                  img_names: ["img1", "img2"]
+                  place_id: "some place id"
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the post
+                  signed_urls:
+                    type: array
+                    items:
+                      type: string
+                      description: signed image url to upload image
+                required:
+                  - id
+                  - signed_urls
+              examples:
+                response:
+                  value:
+                    id: "12ae3c"
+                    signed_urls: ["https://some_domain.some_storage/msdlfkmsd", "https://some_domain.some_storage/mdofgre"]
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+    patch:
+      summary: Updates not published post
+      description: Method updates post
+      tags:
+        - Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_id:
+                  type: string
+                text:
+                  type: string
+                imgs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: image name
+                      action:
+                        type: string
+                        description: enum value INSERT/MOVE/DELETE
+                      position:
+                        type: integer
+                        description: position of inserted or moved image
+                    required:
+                      - name
+                      - action
+                place_id:
+                  type: string
+              required:
+                - post_id
+            examples:
+              request:
+                value:
+                  post_id: "fdslkfmsdl"
+                  imgs:
+                    - name: "img3"
+                      action: "INSERT"
+                      position: 2
+                    - name: "img2"
+                      action: "DELETE"
+                    - name: "img1"
+                      action: "MOVE"
+                      position: 1
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the post
+                  signed_urls:
+                    type: array
+                    items:
+                      type: string
+                      description: signed url to upload inserted image
+                required:
+                  - id
+              examples:
+                response:
+                  value:
+                    id: "12ae3c"
+                    signed_urls: ["https://some_domain.some_storage/msdlfkmsd"]
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /post/{id}:
+    get:
+      summary: Receive post
+      description: Method receives post by id
+      tags:
+        - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Post id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the post
+                  text:
+                    type: string
+                  img_urls:
+                    type: array
+                    items:
+                      type: string
+                      description: img url to download
+                  place_id:
+                    type: string
+                  rating:
+                    type: integer
+                    description: number of reactions (likes)
+                  comments_count:
+                    type: integer
+                  is_rated:
+                    type: boolean
+                    description: is the post rated by user
+                  author_id:
+                    type: string
+                required:
+                  - id
+                  - text
+                  - img_urls
+                  - place_id
+                  - rating
+                  - comments_count
+                  - is_rated
+                  - author_id
+              examples:
+                response:
+                  value:
+                    id: "12ae3c"
+                    text: "some information"
+                    img_urls: ["https://some_domain.some_storage/msdlfkmsd"]
+                    place_id: "dsfdsf"
+                    rating: 13
+                    comments_count: 0
+                    is_rated: false
+                    author_id: "9fb21c"
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+    delete:
+      summary: Deletes post
+      description: Method deletes post
+      tags:
+        - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Post id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /posts:
+    get:
+      summary: Search popular fresh posts
+      description: Method searches popular fresh posts
+      tags:
+        - Post
+      parameters:
+        - name: place_id
+          in: query
+          required: false
+          description: Filter posts by place
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: false
+          description: Filter posts by author
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Max number of posts to return
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          description: Number of posts to skip
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: post id
+                    text:
+                      type: string
+                    img_urls:
+                      type: array
+                      items:
+                        type: string
+                        description: img url to download
+                    place_id:
+                      type: string
+                    rating:
+                      type: integer
+                      description: number of reactions (likes)
+                    comments_count:
+                      type: integer
+                    is_rated:
+                      type: boolean
+                      description: is the post rated by user
+                    author_id:
+                      type: string
+                  required:
+                    - id
+                    - text
+                    - img_urls
+                    - place_id
+                    - rating
+                    - comments_count
+                    - is_rated
+                    - author_id
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /post/publish:
+    post:
+      summary: Publishes post
+      description: Method publishes post
+      tags:
+        - Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_id:
+                  type: string
+                  description: post_id to publicate
+              required:
+                - post_id
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /post/rating:
+    patch:
+      summary: Rates/unrates post
+      description: Method rates post or retract it's rate
+      tags:
+        - Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_id:
+                  type: string
+                  description: post_id to rate
+              required:
+                - post_id
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the post
+                  is_rated:
+                    type: boolean
+                    description: is the user rated the post
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  
+  /comment:
+    post:
+      summary: Create comment
+      description: Method creates comment
+      tags:
+        - Comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                post_id:
+                  type: string
+              required:
+                - text
+                - post_id
+            examples:
+              request:
+                value:
+                  text: "beautiful place"
+                  post_id: "dsdfaf"
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the comment
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /comment/{id}:
+    delete:
+      summary: Deletes comment
+      description: Method deletes comment
+      tags:
+        - Comment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Comment id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /post/{post_id}/comments:
+    get:
+      summary: List comments
+      description: Method lists comments
+      tags:
+        - Comment
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: Post id
+          schema:
+            type: string
+        - name: position
+          in: query
+          required: true
+          description: pointer from which should read comments
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: true
+          description: Max number of comments to return
+          schema:
+            type: integer
+        - name: direction
+          in: query
+          required: false
+          description: direction to read comments from the position
+          schema:
+            type: string
+            enum:
+              - PREV
+              - NEXT
+            default: NEXT
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the post
+                  comments:
+                    type: array
+                    items:
+                      type: string
+                      description: comments
+                  prev:
+                    type: integer
+                    description: pointer to the previous page
+                  next:
+                    type: integer
+                    description: pointer to the next page
+                required:
+                  - id
+                  - comments
+                  - prev
+                  - next
+              examples:
+                response:
+                  value:
+                    id: "12ae3c"
+                    comments: ["comment1", "comment2"]
+                    prev: 10
+                    next: 15
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+
+  /user/{id}:
+    get:
+      summary: Receive user info
+      description: Method receives user info by id
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the user
+                  is_subscribed:
+                    type: boolean
+                    description: are you subscribed to the user
+                required:
+                  - id
+                  - is_subscribed
+              examples:
+                response:
+                  value:
+                    id: "12ae3c"
+                    is_subscribed: true
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  /user/subscribe:
+    patch:
+      summary: subscribes/unsubscribes on user
+      description: Method subscribes/unsubscribes on user
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  description: user_id to subscribe
+              required:
+                - user_id
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: id of the user
+                  is_subscribed:
+                    type: boolean
+                    description: are you subscribed to the user
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+
+  /place/{id}/search:
+    get:
+      summary: Search popular places
+      description: Method searches popular places
+      tags:
+        - Place
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Place id
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Max number of places to return
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          description: Number of places to skip
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: place id
+                    rating:
+                      type: integer
+                      description: total number of ratings (likes) for the place
+                  required:
+                    - id
+                    - rating
+              examples:
+                response:
+                  value:
+                    - id: "12ae3c"
+                      rating: 123
+        "400":
+          description: Bad Request
+        "500":
+          description: Server error
+  
+  /auth/logout:
+    get:
+      summary: Expire session and logout user
+      tags:
+        - Auth
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+  /auth/oauth/authorize:
+    get:
+      summary: Start authorize oauth2 for user
+      description: Start authorize oauth2 for user
+      tags:
+        - Auth
+      parameters:
+        - name: redirect_url
+          in: query
+          required: false
+          description: redirect url
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Found
+  /auth/oauth/token:
+    get:
+      summary: Handel oauth2 token, to generate auth jwt token
+      description: Handel oauth2 token, to generate auth jwt token
+      tags:
+        - Auth
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: redirect_url
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt:
+                    type: string
+                    description: jwt token (lives 1 day)
+                  refresh_token:
+                    type: string
+                    description: refresh token (30 days)
+                required:
+                  - jwt
+                  - refresh_token
+              examples:
+                response:
+                  value:
+                    - jwt: "adjnfsdkjfnvfskns"
+                      refresh_token: "dnjfklmvoriefimofm"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+  /auth/refresh:
+    get:
+      summary: RefreshSession jwt token for user
+      tags:
+        - Auth
+      description: RefreshSession jwt token for user
+      parameters:
+        - description: user refresh token
+          in: header
+          name: X-Refresh-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt:
+                    type: string
+                    description: jwt token (lives 1 day)
+                  refresh_token:
+                    type: string
+                    description: refresh token (30 days)
+                required:
+                  - jwt
+                  - refresh_token
+              examples:
+                response:
+                  value:
+                    - jwt: "adjnfsdkjfnvfskns"
+                      refresh_token: "dnjfklmvoriefimofm"
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server error
