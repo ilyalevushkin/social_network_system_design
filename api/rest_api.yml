@@ -5,6 +5,7 @@ tags:
   - name: Comment
   - name: User
   - name: Place
+  - name: Auth
 
 info:
   title: TripSocialNetwork API
@@ -640,3 +641,117 @@ paths:
           description: Bad Request
         "500":
           description: Server error
+  
+  /auth/logout:
+    get:
+      summary: Expire session and logout user
+      tags:
+        - Auth
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+  /auth/oauth/authorize:
+    get:
+      summary: Start authorize oauth2 for user
+      description: Start authorize oauth2 for user
+      tags:
+        - Auth
+      parameters:
+        - name: redirect_url
+          in: query
+          required: false
+          description: redirect url
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Found
+  /auth/oauth/token:
+    get:
+      summary: Handel oauth2 token, to generate auth jwt token
+      description: Handel oauth2 token, to generate auth jwt token
+      tags:
+        - Auth
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: redirect_url
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt:
+                    type: string
+                    description: jwt token (lives 1 day)
+                  refresh_token:
+                    type: string
+                    description: refresh token (30 days)
+                required:
+                  - jwt
+                  - refresh_token
+              examples:
+                response:
+                  value:
+                    - jwt: "adjnfsdkjfnvfskns"
+                      refresh_token: "dnjfklmvoriefimofm"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+  /auth/refresh:
+    get:
+      summary: RefreshSession jwt token for user
+      tags:
+        - Auth
+      description: RefreshSession jwt token for user
+      parameters:
+        - description: user refresh token
+          in: header
+          name: X-Refresh-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt:
+                    type: string
+                    description: jwt token (lives 1 day)
+                  refresh_token:
+                    type: string
+                    description: refresh token (30 days)
+                required:
+                  - jwt
+                  - refresh_token
+              examples:
+                response:
+                  value:
+                    - jwt: "adjnfsdkjfnvfskns"
+                      refresh_token: "dnjfklmvoriefimofm"
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server error
