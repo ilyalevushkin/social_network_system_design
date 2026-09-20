@@ -315,7 +315,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /posts/{id}/status:
+  /posts/{id}/statuses:
     post:
       summary: Publishes post
       description: Method publishes post
@@ -539,24 +539,19 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /users/subscribe:
+  /users/{id}/subscriptions:
     patch:
       summary: subscribes/unsubscribes on user
       description: Method subscribes/unsubscribes on user
       tags:
         - User
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  type: string
-                  description: user_id to subscribe
-              required:
-                - user_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User id
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
