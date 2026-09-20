@@ -13,7 +13,7 @@ info:
   version: 1.0.0
 
 paths:
-  /post:
+  /posts:
     post:
       summary: Create post
       description: Method creates post
@@ -150,7 +150,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /post/{id}:
+  /posts/{id}:
     get:
       summary: Receive post
       description: Method receives post by id
@@ -314,7 +314,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /post/publish:
+  /posts/publish:
     post:
       summary: Publishes post
       description: Method publishes post
@@ -339,7 +339,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /post/rating:
+  /posts/ratings:
     patch:
       summary: Rates/unrates post
       description: Method rates post or retract it's rate
@@ -376,7 +376,7 @@ paths:
         "500":
           description: Server error
   
-  /comment:
+  /comments:
     post:
       summary: Create comment
       description: Method creates comment
@@ -416,7 +416,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /comment/{id}:
+  /comments/{id}:
     delete:
       summary: Deletes comment
       description: Method deletes comment
@@ -436,7 +436,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /post/{post_id}/comments:
+  /posts/{post_id}/comments:
     get:
       summary: List comments
       description: Method lists comments
@@ -510,7 +510,7 @@ paths:
         "500":
           description: Server error
 
-  /user/{id}:
+  /users/{id}:
     get:
       summary: Receive user info
       description: Method receives user info by id
@@ -549,7 +549,7 @@ paths:
           description: Bad Request
         "500":
           description: Server error
-  /user/subscribe:
+  /users/subscribe:
     patch:
       summary: subscribes/unsubscribes on user
       description: Method subscribes/unsubscribes on user
@@ -586,7 +586,7 @@ paths:
         "500":
           description: Server error
 
-  /place/{id}/search:
+  /places/{id}/search:
     get:
       summary: Search popular places
       description: Method searches popular places
