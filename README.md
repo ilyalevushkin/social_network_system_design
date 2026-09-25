@@ -139,13 +139,12 @@ Post
 #### Transaction
 
     post_id ~ 16 bytes
-    point ~ 8 bytes
 
 Итого 24 bytes
 
 #### Трафик
 
-    traffic в сезон = 900 * 24 = 23 kb/s
+    traffic в сезон = 900 * 16 = 15 kb/s
 
 ### подписки на путешественников (write)
 
@@ -165,3 +164,152 @@ Post
 #### Трафик
 
     traffic в сезон = 900 * 32 ~= 30 kb/s
+
+## Расчет ресурсов
+
+### Диски
+
+#### Посты
+
+##### Capacity
+
+    meta+text = 80 kb/s * 86400 * 365 ~= 80 kb/s * 100000 * 400 = 4 TB
+    static = 100 mb/s * 86400 * 365 ~= 100 mb/s * 100000 * 400 = 4 PB
+
+##### HDD
+
+    meta+text:
+    disks by capacity = 4 TB / 32 TB = 1 disks
+    disks by bandwidth = (80 kb/s + 18 mb/s + 6 mb/s) / 100 mb/s ~= 1 disk
+    disks by iops = (20 + 900 + 300) / 100 rps ~= 13 disks
+
+    Total = 13 disks
+
+    static:
+    disks by capacity = 4 PB / 32 TB ~= 150 disks
+    disks by bandwidth = (100 mb/s + 22 gb/s + 7 gb/s) / 100 mb/s ~= 291 disks
+    disks by iops = (20 + 900 + 300) / 100 rps ~= 13 disks
+
+    Total = 291 disks
+
+##### SSD (SATA)
+
+    meta+text:
+    disks by capacity = 4 TB / 100 TB = 1 disks
+    disks by bandwidth = (80 kb/s + 18 mb/s + 6 mb/s) / 500 mb/s ~= 1 disk
+    disks by iops = (20 + 900 + 300) / 1000 rps ~= 2 disks
+
+    Total = 2 disks
+
+    static:
+    disks by capacity = 4 PB / 100 TB ~= 40 disks
+    disks by bandwidth = (100 mb/s + 22 gb/s + 7 gb/s) / 500 mb/s ~= 60 disks
+    disks by iops = (20 + 900 + 300) / 1000 rps ~= 2 disks
+
+    Total = 60 disks
+
+##### SSD (NVME)
+
+    meta+text:
+    disks by capacity = 4 TB / 30 TB = 1 disks
+    disks by bandwidth = (80 kb/s + 18 mb/s + 6 mb/s) / 3000 mb/s ~= 1 disk
+    disks by iops = (20 + 900 + 300) / 10000 rps ~= 1 disks
+
+    Total = 1 disks
+
+    static:
+    disks by capacity = 4 PB / 30 TB ~= 134 disks
+    disks by bandwidth = (100 mb/s + 22 gb/s + 7 gb/s) / 3 gb/s ~= 10 disks
+    disks by iops = (20 + 900 + 300) / 10000 rps ~= 1 disks
+
+    Total = 10 disks
+
+#### Реакции
+
+##### Capacity
+
+    15 kb/s * 86400 * 365 ~= 15 kb/s * 100000 * 400 = 1 TB
+
+##### HDD
+
+    disks by capacity = 1 TB / 32 TB = 1 disks
+    disks by bandwidth = 15 kb/s / 100 mb/s ~= 1 disk
+    disks by iops = 900 / 100 rps ~= 9 disks
+
+    Total = 9 disks
+
+##### SSD (SATA)
+
+    disks by capacity = 1 TB / 100 TB = 1 disks
+    disks by bandwidth = 15 kb/s / 500 mb/s ~= 1 disk
+    disks by iops = 900 / 1000 rps ~= 1 disks
+
+    Total = 1 disks
+
+##### SSD (NVME)
+
+    disks by capacity = 1 TB / 30 TB = 1 disks
+    disks by bandwidth = 15 kb/s / 3000 mb/s ~= 1 disk
+    disks by iops = 900 / 10000 rps ~= 1 disks
+
+    Total = 1 disks
+
+#### Подписки на путешественников
+
+##### Capacity
+
+    30 kb/s * 86400 * 365 = 30 * 100000 * 400 ~= 2 TB
+
+##### HDD
+
+    disks by capacity = 2 TB / 32 TB = 1 disks
+    disks by bandwidth = 30 kb/s / 100 mb/s ~= 1 disk
+    disks by iops = 14 / 100 rps ~= 1 disks
+
+    Total = 1
+
+##### SSD (SATA)
+
+    disks by capacity = 2 TB / 100 TB = 1 disks
+    disks by bandwidth = 30 kb/s / 500 mb/s ~= 1 disk
+    disks by iops = 14 / 1000 rps ~= 1 disks
+
+    Total = 1 disks
+
+##### SSD (NVME)
+
+    disks by capacity = 2 TB / 30 TB = 1 disks
+    disks by bandwidth = 30 kb/s / 3000 mb/s ~= 1 disk
+    disks by iops = 14 / 10000 rps ~= 1 disks
+
+    Total = 1 disks
+
+#### Комментарии
+
+##### Capacity
+
+    100 kb/s * 86400 * 365 ~= 100 * 100000 * 400 = 4 TB
+
+##### HDD
+
+    disks by capacity = 4 TB / 32 TB = 1 disks
+    disks by bandwidth = (100 kb/s + 10 mb/s) / 100 mb/s ~= 1 disk
+    disks by iops = (100 + 9000) / 100 rps ~= 91 disks
+
+    Total = 91 disks
+
+##### SSD (SATA)
+
+    disks by capacity = 4 TB / 100 TB = 1 disks
+    disks by bandwidth = (100 kb/s + 10 mb/s) / 500 mb/s ~= 1 disk
+    disks by iops = 9100 / 1000 rps ~= 10 disks
+
+    Total = 10 disks
+
+##### SSD (NVME)
+
+    disks by capacity = 4 TB / 30 TB = 1 disks
+    disks by bandwidth = (100 kb/s + 10 mb/s) / 3000 mb/s ~= 1 disk
+    disks by iops = 9100 / 10000 rps ~= 1 disks
+
+    Total = 1 disks
