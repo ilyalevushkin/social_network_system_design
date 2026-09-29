@@ -46,6 +46,7 @@ Table comments {
   id integer [primary key]
   text text [note: 'Content of the comment']
   post_id integer [not null]
+  author_id integer [not null]
   created_at timestamp
   index integer [note: 'unique incremented index']
 }
