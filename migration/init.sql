@@ -30,7 +30,6 @@ Table posts {
   author_id integer [not null]
   status post_status [not null]
   created_at timestamp
-  deleted_at timestamp
   place_id integer [not null]
   img_urls text[]
   rating integer
